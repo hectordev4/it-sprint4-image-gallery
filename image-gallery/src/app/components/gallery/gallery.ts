@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { Image } from '../../models/image.model';
-import { ImageItem } from '../image-item/image-item';
+import { ImageItem } from '../item-image/item-image';
 
 @Component({
   selector: 'app-gallery',
