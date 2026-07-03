@@ -9,11 +9,15 @@ import { Image } from '../../models/image.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div 
-      class="group relative w-full overflow-hidden rounded-xl bg-gray-200 shadow-xs transition-all duration-300 hover:shadow-md"
+      class="group relative w-full overflow-hidden rounded-xl bg-gray-200 shadow-xs transition-all duration-300 hover:shadow-md cursor-pointer"
       [class.lg:col-span-2]="isFeatured()"
       [class.lg:row-span-2]="isFeatured()"
       [class.h-96]="isFeatured()"
-      [class.h-48]="!isFeatured()">
+      [class.h-48]="!isFeatured()"
+      [class.ring-4]="isSelected()"
+      [class.ring-blue-500]="isSelected()"
+      (click)="onCardClick($event)"
+    >
       <div class="relative w-full h-full">
         <img 
           [ngSrc]="image().url" 
@@ -23,6 +27,30 @@ import { Image } from '../../models/image.model';
           class="object-cover transition-transform duration-500 group-hover:scale-105" 
         />
         
+        <!-- Selection Checkbox Badge -->
+        <div 
+          class="absolute top-2 left-2 z-20 transition-opacity duration-200"
+          [class.opacity-100]="isSelected()"
+          [class.opacity-0]="!isSelected()"
+          [class.group-hover:opacity-100]="!isSelected()"
+        >
+          <button
+            type="button"
+            (click)="onSelectToggle($event)"
+            class="flex h-6 w-6 items-center justify-center rounded-full border border-gray-300 shadow-xs transition-colors"
+            [class.bg-blue-500]="isSelected()"
+            [class.border-blue-500]="isSelected()"
+            [class.text-white]="isSelected()"
+            [class.bg-white/80]="!isSelected()"
+            [class.text-transparent]="!isSelected()"
+            [class.backdrop-blur-xs]="!isSelected()"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </button>
+        </div>
+
         <!-- Delete Button -->
         <div class="absolute top-2 right-2 z-20 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
           <button
@@ -51,10 +79,22 @@ import { Image } from '../../models/image.model';
 export class ImageItem {
   image = input.required<Image>();
   isFeatured = input<boolean>(false);
+  isSelected = input<boolean>(false);
+
   delete = output<string>();
+  toggleSelect = output<string>();
+
+  onCardClick(event: MouseEvent): void {
+    this.toggleSelect.emit(this.image().id);
+  }
+
+  onSelectToggle(event: MouseEvent): void {
+    event.stopPropagation(); // Stops event bubbling up to the card click or drag context
+    this.toggleSelect.emit(this.image().id);
+  }
 
   onDeleteClick(event: MouseEvent): void {
-    event.stopPropagation();
+    event.stopPropagation(); // Stops triggering card selection when hitting delete
     this.delete.emit(this.image().id);
   }
 }
