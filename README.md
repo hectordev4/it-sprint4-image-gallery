@@ -1,4 +1,3 @@
-```markdown
 # Image Gallery
 
 An interactive image gallery built with Angular, Tailwind CSS and PrimeNG.
